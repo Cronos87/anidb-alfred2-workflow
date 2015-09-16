@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string></string>
+	<key>category</key>
+	<string>Internet</string>
+	<key>connections</key>
+	<dict>
+		<key>0661BB81-ECAF-4FC2-A18D-852DEF8892D6</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>F6BDBD48-F6EE-4BD4-A5C4-4408279D6302</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>8B1A3F39-FA89-49BB-BE22-7E43FE3BC76B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>6EF02977-6CC2-490B-91AD-E1AD48E3902C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>E50E5B5F-D4D0-45F8-A1A0-70490A544DC4</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>0661BB81-ECAF-4FC2-A18D-852DEF8892D6</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Yohan Tambè</string>
+	<key>description</key>
+	<string>Search an anime and open the fiche</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Anidb Search</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>plusspaces</key>
+				<false/>
+				<key>url</key>
+				<string>http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>6EF02977-6CC2-490B-91AD-E1AD48E3902C</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>keyword</key>
+				<string>anidb</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Please wait...</string>
+				<key>script</key>
+				<string>require_once('worflows.php');
+$w = new Workflows();
+
+$animes = json_decode(file_get_contents('anime-titles.json'), true);
+
+$search = strtolower(trim('{query}'));
+$search = str_replace('\\ ', ' ', $search);
+
+$searchKeywords = explode(' ', $search);
+$numberOfKeywords = count($searchKeywords);
+
+$datas = [];
+
+foreach($animes as $anime) {
+	$numberOfOccurence = 0;
+
+	foreach($searchKeywords as $keyword) {
+		if (strpos(strtolower($anime['title']), $keyword) !== false) {
+			$numberOfOccurence++;
+		}
+	}
+
+	if ($numberOfOccurence &gt; 0) {
+		if ($numberOfOccurence === $numberOfKeywords) {
+			array_unshift($datas, $anime);
+		} elseif($numberOfOccurence === $numberOfKeywords - 1) {
+			$datas[] = $anime;
+		}
+	}
+}
+
+if (count($datas) &gt; 0) {
+	foreach($datas as $data) {
+		$w-&gt;result($data['id'], $data['id'], $data['title'], "", "");
+	}
+} else {
+	$w-&gt;result(1, "no result", "No result...", "", "");
+}
+
+echo $w-&gt;toxml();</string>
+				<key>subtext</key>
+				<string>Search and open anime fiche</string>
+				<key>title</key>
+				<string>AniDB</string>
+				<key>type</key>
+				<integer>1</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>8B1A3F39-FA89-49BB-BE22-7E43FE3BC76B</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>php update-db.php</string>
+				<key>type</key>
+				<integer>5</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>0661BB81-ECAF-4FC2-A18D-852DEF8892D6</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>output</key>
+				<integer>0</integer>
+				<key>removeextension</key>
+				<false/>
+				<key>sticky</key>
+				<false/>
+				<key>text</key>
+				<string>Database has been updated successfully</string>
+				<key>title</key>
+				<string>AniDB Database Update</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>F6BDBD48-F6EE-4BD4-A5C4-4408279D6302</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>anidb</string>
+				<key>subtext</key>
+				<string>Update the local database</string>
+				<key>text</key>
+				<string>AniDB Update Database</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>E50E5B5F-D4D0-45F8-A1A0-70490A544DC4</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string></string>
+	<key>uidata</key>
+	<dict>
+		<key>0661BB81-ECAF-4FC2-A18D-852DEF8892D6</key>
+		<dict>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+		<key>6EF02977-6CC2-490B-91AD-E1AD48E3902C</key>
+		<dict>
+			<key>ypos</key>
+			<real>10</real>
+		</dict>
+		<key>8B1A3F39-FA89-49BB-BE22-7E43FE3BC76B</key>
+		<dict>
+			<key>ypos</key>
+			<real>10</real>
+		</dict>
+		<key>E50E5B5F-D4D0-45F8-A1A0-70490A544DC4</key>
+		<dict>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+		<key>F6BDBD48-F6EE-4BD4-A5C4-4408279D6302</key>
+		<dict>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+	</dict>
+	<key>webaddress</key>
+	<string></string>
+</dict>
+</plist>
